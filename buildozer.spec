@@ -25,7 +25,7 @@ android.archs = arm64-v8a, armeabi-v7a
 
 android.allow_backup = True
 
-p4a.branch = 2024.1.21
+p4a.branch = v2024.01.21
 
 [buildozer]
 
