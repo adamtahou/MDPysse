@@ -34,16 +34,33 @@ jobs:
           restore-keys: |
             buildozer-
 
-      - name: Acceptation automatique des licences Android SDK
+      - name: Installation des Android command-line tools et acceptation des licences
         run: |
-          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
-          printf '\n8933bad161af4408943e6c3e4f5b7d4755caa3e4\nd56f5187479451eabf01fb78af6dfcb131a6481e\n24333f8a63b6825ea9c5514f83c2829b004d1fee' \
-            > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-          printf '\n84831b9409646a918e30573bab4c9c91346d8abd' \
-            > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
+          SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk
+          mkdir -p $SDK_ROOT/cmdline-tools
+
+          # Téléchargement des outils Android (sdkmanager)
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
+            -O /tmp/cmdtools.zip
+          unzip -q /tmp/cmdtools.zip -d /tmp/cmdtools
+          mv /tmp/cmdtools/cmdline-tools $SDK_ROOT/cmdline-tools/latest
+
+          # Acceptation de toutes les licences
+          yes | $SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+            --sdk_root=$SDK_ROOT --licenses
+
+          # Installation des composants SDK nécessaires
+          $SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+            --sdk_root=$SDK_ROOT \
+            "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+          # Symlink vers l'ancien chemin que python-for-android cherche
+          mkdir -p $SDK_ROOT/tools/bin
+          ln -sf $SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+            $SDK_ROOT/tools/bin/sdkmanager
 
       - name: Build APK (debug)
-        run: yes | buildozer -v android debug
+        run: buildozer -v android debug
 
       - name: Upload de l'APK
         uses: actions/upload-artifact@v4
