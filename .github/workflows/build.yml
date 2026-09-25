@@ -14,11 +14,17 @@ jobs:
       - name: Checkout du code
         uses: actions/checkout@v4
 
+      - name: Forcer Java 17 (sdkmanager requiert Java 17+)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
       - name: Installation des dépendances système
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            git zip unzip openjdk-17-jdk \
+            git zip unzip \
             build-essential libffi-dev libssl-dev \
             autoconf automake libtool libtool-bin \
             zlib1g-dev pkg-config python3-pip
@@ -39,22 +45,18 @@ jobs:
           SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk
           mkdir -p $SDK_ROOT/cmdline-tools
 
-          # Téléchargement des outils Android (sdkmanager)
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
             -O /tmp/cmdtools.zip
           unzip -q /tmp/cmdtools.zip -d /tmp/cmdtools
           mv /tmp/cmdtools/cmdline-tools $SDK_ROOT/cmdline-tools/latest
 
-          # Acceptation de toutes les licences
           yes | $SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
             --sdk_root=$SDK_ROOT --licenses
 
-          # Installation des composants SDK nécessaires
           $SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
             --sdk_root=$SDK_ROOT \
             "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
-          # Symlink vers l'ancien chemin que python-for-android cherche
           mkdir -p $SDK_ROOT/tools/bin
           ln -sf $SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
             $SDK_ROOT/tools/bin/sdkmanager
