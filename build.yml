@@ -1,1 +1,46 @@
+name: Build APK Android
 
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:   # Permet aussi de lancer manuellement depuis l'interface GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Installation des dépendances système
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git zip unzip openjdk-17-jdk \
+            build-essential libffi-dev libssl-dev \
+            autoconf automake libtool libtool-bin \
+            zlib1g-dev pkg-config python3-pip
+
+      - name: Installation de Buildozer et Cython
+        run: |
+          pip3 install buildozer cython
+
+      - name: Cache Buildozer (SDK/NDK Android — évite de tout retélécharger à chaque build)
+        uses: actions/cache@v4
+        with:
+          path: ~/.buildozer
+          key: buildozer-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            buildozer-
+
+      - name: Build APK (debug)
+        run: buildozer -v android debug
+
+      - name: Upload de l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: crypyte-pwdgen-apk
+          path: bin/*.apk
+          retention-days: 30
