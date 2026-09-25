@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    timeout-minutes: 900
+    timeout-minutes: 90
 
     steps:
       - name: Checkout du code
@@ -36,11 +36,11 @@ jobs:
 
       - name: Acceptation automatique des licences Android SDK
         run: |
-          mkdir -p /root/.buildozer/android/platform/android-sdk/licenses
+          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
           printf '\n8933bad161af4408943e6c3e4f5b7d4755caa3e4\nd56f5187479451eabf01fb78af6dfcb131a6481e\n24333f8a63b6825ea9c5514f83c2829b004d1fee' \
-            > /root/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+            > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
           printf '\n84831b9409646a918e30573bab4c9c91346d8abd' \
-            > /root/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
+            > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
 
       - name: Build APK (debug)
         run: yes | buildozer -v android debug
