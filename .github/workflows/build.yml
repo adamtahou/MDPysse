@@ -1,3 +1,7 @@
+- name: Nettoyage du build Android
+  run: |
+    rm -rf .buildozer
+    rm -rf bin
 name: Build APK Android
 
 on:
