@@ -3,12 +3,12 @@ name: Build APK Android
 on:
   push:
     branches: [ main, master ]
-  workflow_dispatch:   # Permet aussi de lancer manuellement depuis l'interface GitHub
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-22.04
-    timeout-minutes: 90
+    timeout-minutes: 900
 
     steps:
       - name: Checkout du code
@@ -24,10 +24,9 @@ jobs:
             zlib1g-dev pkg-config python3-pip
 
       - name: Installation de Buildozer et Cython
-        run: |
-          pip3 install buildozer cython
+        run: pip3 install buildozer cython
 
-      - name: Cache Buildozer (SDK/NDK Android — évite de tout retélécharger à chaque build)
+      - name: Cache Buildozer (SDK/NDK Android)
         uses: actions/cache@v4
         with:
           path: ~/.buildozer
@@ -35,8 +34,16 @@ jobs:
           restore-keys: |
             buildozer-
 
+      - name: Acceptation automatique des licences Android SDK
+        run: |
+          mkdir -p /root/.buildozer/android/platform/android-sdk/licenses
+          printf '\n8933bad161af4408943e6c3e4f5b7d4755caa3e4\nd56f5187479451eabf01fb78af6dfcb131a6481e\n24333f8a63b6825ea9c5514f83c2829b004d1fee' \
+            > /root/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          printf '\n84831b9409646a918e30573bab4c9c91346d8abd' \
+            > /root/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
+
       - name: Build APK (debug)
-        run: buildozer -v android debug
+        run: yes | buildozer -v android debug
 
       - name: Upload de l'APK
         uses: actions/upload-artifact@v4
