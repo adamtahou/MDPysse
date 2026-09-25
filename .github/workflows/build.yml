@@ -24,6 +24,30 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      - name: Installation de Buildozer et Cython
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install \
+            "buildozer==1.5.0" \
+            "python-for-android==2024.1.21" \
+            "sh>=1.10,<2.0" \
+            "cython<3.1"
+            
+      - name: Inspect python-for-android Python recipes
+        run: |
+          git clone --depth 1 https://github.com/kivy/python-for-android.git /tmp/python-for-android
+          cd /tmp/python-for-android
+
+          echo "python3 recipe:"
+          grep -R "3.11" pythonforandroid/recipes/python3 || true
+
+          echo "hostpython3 recipe:"
+          grep -R "3.11" pythonforandroid/recipes/hostpython3 || true
+
+          python -m pip install \
+            "https://github.com/kivy/python-for-android/archive/<COMPATIBLE_COMMIT>.zip"
+
           
       - name: Installation des dépendances système
         run: |
@@ -34,13 +58,6 @@ jobs:
             autoconf automake libtool libtool-bin \
             zlib1g-dev pkg-config python3-pip
 
-      - name: Installation de Buildozer et Cython
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install \
-            "buildozer==1.5.0" \
-            "python-for-android==2024.1.21" \
-            "cython<3.1"
 
       - name: Cache Buildozer
         uses: actions/cache@v4
