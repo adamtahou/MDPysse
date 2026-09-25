@@ -34,21 +34,7 @@ jobs:
             "sh>=1.10,<2.0" \
             "cython<3.1"
             
-      - name: Inspect python-for-android Python recipes
-        run: |
-          git clone --depth 1 https://github.com/kivy/python-for-android.git /tmp/python-for-android
-          cd /tmp/python-for-android
-
-          echo "python3 recipe:"
-          grep -R "3.11" pythonforandroid/recipes/python3 || true
-
-          echo "hostpython3 recipe:"
-          grep -R "3.11" pythonforandroid/recipes/hostpython3 || true
-
-          python -m pip install \
-            "https://github.com/kivy/python-for-android/archive/<COMPATIBLE_COMMIT>.zip"
-
-          
+  
       - name: Installation des dépendances système
         run: |
           sudo apt-get update
